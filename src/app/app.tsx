@@ -1,4 +1,5 @@
 import Draggable from "@/components/draggable";
+import DropZone from "@/components/drop-zone";
 import { DndContext } from "@dnd-kit/core";
 import { useState } from "react";
 
@@ -23,8 +24,9 @@ function App() {
   const [draggables, setDraggables] =
     useState<DraggableTypes[]>(DefaultDraggables);
   return (
-    <div className="flex h-screen w-full items-center justify-center">
+    <div className="flex h-screen w-full flex-col items-center justify-center gap-16">
       <DndContext>
+        <DropZone />
         <div className="flex gap-2">
           {draggables.map((draggable) => (
             <Draggable key={draggable.id} draggable={draggable} />
