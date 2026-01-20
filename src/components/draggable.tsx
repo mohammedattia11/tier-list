@@ -1,7 +1,8 @@
+import type { DraggableTypes } from "@/types";
 import { useDraggable } from "@dnd-kit/core";
 
 type DraggablePropsTypes = {
-  draggable: { id: string; src: string };
+  draggable: DraggableTypes;
 };
 
 function Draggable({ draggable }: DraggablePropsTypes) {
@@ -21,7 +22,11 @@ function Draggable({ draggable }: DraggablePropsTypes) {
       {...listeners}
       {...attributes}
     >
-      <img src={`/src/assets/${src}`} alt={src} />
+      <img
+        src={`/src/assets/${src}`}
+        alt={src}
+        className="w-32 h-32 object-contain"
+      />
     </button>
   );
 }

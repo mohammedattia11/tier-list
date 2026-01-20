@@ -1,36 +1,57 @@
 import Draggable from "@/components/draggable";
 import DropZone from "@/components/drop-zone";
-import { DndContext } from "@dnd-kit/core";
+import type { DraggableTypes } from "@/types";
+import { DndContext, type DragEndEvent } from "@dnd-kit/core";
 import { useState } from "react";
 
-type DraggableTypes = {
-  id: string;
-  src: string;
-};
-
+// drop zone used to attach each object to specefic drop zone and if it undfined means it hasn't attached to any available drop zone
 const DefaultDraggables: DraggableTypes[] = [
-  { id: crypto.randomUUID(), src: "bomber-card.png" },
-  { id: crypto.randomUUID(), src: "executioner-card.png" },
-  { id: crypto.randomUUID(), src: "goblin-barrel.png" },
-  { id: crypto.randomUUID(), src: "ice-spirit-card.png" },
-  { id: crypto.randomUUID(), src: "royal-hogs-card.png" },
-  { id: crypto.randomUUID(), src: "valkyrie-card.png" },
-  { id: crypto.randomUUID(), src: "wall-breakers-card.png" },
-  { id: crypto.randomUUID(), src: "witch-card.png" },
-  { id: crypto.randomUUID(), src: "zap-card.png" },
+  { id: crypto.randomUUID(), src: "bomber-card.png", dropZone: undefined },
+  { id: crypto.randomUUID(), src: "executioner-card.png", dropZone: undefined },
+  { id: crypto.randomUUID(), src: "goblin-barrel.png", dropZone: undefined },
+  { id: crypto.randomUUID(), src: "ice-spirit-card.png", dropZone: undefined },
+  { id: crypto.randomUUID(), src: "royal-hogs-card.png", dropZone: undefined },
+  { id: crypto.randomUUID(), src: "valkyrie-card.png", dropZone: undefined },
+  {
+    id: crypto.randomUUID(),
+    src: "wall-breakers-card.png",
+    dropZone: undefined,
+  },
+  { id: crypto.randomUUID(), src: "witch-card.png", dropZone: undefined },
+  { id: crypto.randomUUID(), src: "zap-card.png", dropZone: undefined },
 ];
 
 function App() {
   const [draggables, setDraggables] =
     useState<DraggableTypes[]>(DefaultDraggables);
+
+  const handleDragEnd = (e: DragEndEvent) => {
+    // draggable didn't touch the drop zone
+    if (!e.over) return;
+    const dropZoneId = e.over.id as string;
+    const activeDraggableId = e.active.id as string;
+    setDraggables((prev) =>
+      prev.map((draggable) =>
+        draggable.id !== activeDraggableId
+          ? draggable
+          : { ...draggable, dropZone: dropZoneId },
+      ),
+    );
+  };
   return (
     <div className="flex h-screen w-full flex-col items-center justify-center gap-16">
-      <DndContext>
-        <DropZone />
+      <DndContext onDragEnd={handleDragEnd}>
+        <DropZone draggables={draggables} />
         <div className="flex gap-2">
-          {draggables.map((draggable) => (
-            <Draggable key={draggable.id} draggable={draggable} />
-          ))}
+          {/*
+            - first filter applied to get the objects that hasn't been attached to any drop zone "undefined"
+            - then map over them to be displayed in the free zone
+            */}
+          {draggables
+            .filter((draggable) => draggable.dropZone === undefined)
+            .map((draggable) => (
+              <Draggable key={draggable.id} draggable={draggable} />
+            ))}
         </div>
       </DndContext>
     </div>
