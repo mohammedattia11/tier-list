@@ -1,8 +1,15 @@
-import Draggable from "@/components/draggable";
+import { activeDraggableAtom } from "@/atoms/active-draggable-atom";
+import DraggableContent from "@/components/draggable-content";
 import DropZone from "@/components/drop-zone";
 import type { DraggableTypes } from "@/types";
-import { DndContext, type DragEndEvent } from "@dnd-kit/core";
+import {
+  DndContext,
+  DragOverlay,
+  type DragEndEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
+import { useAtom } from "jotai";
 import { useState } from "react";
 
 // drop zone used to attach each object to specefic drop zone and if it undfined means it hasn't attached to any available drop zone
@@ -25,10 +32,18 @@ const DefaultDraggables: DraggableTypes[] = [
 function App() {
   const [draggables, setDraggables] =
     useState<DraggableTypes[]>(DefaultDraggables);
+  const [activeDraggable, setActiveDraggable] = useAtom(activeDraggableAtom);
+
+  const handleDragStart = (e: DragStartEvent) => {
+    const activeDraggable = draggables.find(
+      (draggable) => draggable.id === e.active.id,
+    );
+    setActiveDraggable(activeDraggable);
+  };
 
   const handleDragEnd = (e: DragEndEvent) => {
     // draggable didn't touch the drop zone
-    if (!e.over) return;
+    if (!e.over) return setActiveDraggable(undefined);
     const overId = e.over.id as string;
     const activeDraggableId = e.active.id as string;
 
@@ -42,10 +57,13 @@ function App() {
 
       return arrayMove(prev, oldIndex, newIndex);
     });
+
+    setActiveDraggable(undefined);
   };
+
   return (
     <div className="flex h-screen w-full flex-col items-center justify-center gap-16">
-      <DndContext onDragEnd={handleDragEnd}>
+      <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <DropZone draggables={draggables} />
         {/*<div className="flex gap-2">*/}
         {/*
@@ -58,6 +76,11 @@ function App() {
               <Draggable key={draggable.id} draggable={draggable} />
             ))}
         </div>*/}
+        <DragOverlay>
+          {activeDraggable && (
+            <DraggableContent draggable={activeDraggable} isDragging />
+          )}
+        </DragOverlay>
       </DndContext>
     </div>
   );
