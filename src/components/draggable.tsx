@@ -1,5 +1,5 @@
 import type { DraggableTypes } from "@/types";
-import { useDraggable } from "@dnd-kit/core";
+import { useSortable } from "@dnd-kit/sortable";
 
 type DraggablePropsTypes = {
   draggable: DraggableTypes;
@@ -7,7 +7,7 @@ type DraggablePropsTypes = {
 
 function Draggable({ draggable }: DraggablePropsTypes) {
   const { id, src } = draggable;
-  const { setNodeRef, listeners, attributes, transform } = useDraggable({ id });
+  const { setNodeRef, listeners, attributes, transform } = useSortable({ id });
 
   const style = {
     transform: transform
@@ -25,7 +25,7 @@ function Draggable({ draggable }: DraggablePropsTypes) {
       <img
         src={`/src/assets/${src}`}
         alt={src}
-        className="w-32 h-32 object-contain"
+        className="h-32 w-32 object-contain"
       />
     </button>
   );

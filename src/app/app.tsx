@@ -2,6 +2,7 @@ import Draggable from "@/components/draggable";
 import DropZone from "@/components/drop-zone";
 import type { DraggableTypes } from "@/types";
 import { DndContext, type DragEndEvent } from "@dnd-kit/core";
+import { arrayMove } from "@dnd-kit/sortable";
 import { useState } from "react";
 
 // drop zone used to attach each object to specefic drop zone and if it undfined means it hasn't attached to any available drop zone
@@ -28,31 +29,35 @@ function App() {
   const handleDragEnd = (e: DragEndEvent) => {
     // draggable didn't touch the drop zone
     if (!e.over) return;
-    const dropZoneId = e.over.id as string;
+    const overId = e.over.id as string;
     const activeDraggableId = e.active.id as string;
-    setDraggables((prev) =>
-      prev.map((draggable) =>
-        draggable.id !== activeDraggableId
-          ? draggable
-          : { ...draggable, dropZone: dropZoneId },
-      ),
-    );
+
+    setDraggables((prev) => {
+      const oldIndex = prev.findIndex(
+        (draggable) => draggable.id === activeDraggableId,
+      );
+      const newIndex = prev.findIndex((draggable) => draggable.id === overId);
+
+      if (oldIndex === newIndex) return prev;
+
+      return arrayMove(prev, oldIndex, newIndex);
+    });
   };
   return (
     <div className="flex h-screen w-full flex-col items-center justify-center gap-16">
       <DndContext onDragEnd={handleDragEnd}>
         <DropZone draggables={draggables} />
-        <div className="flex gap-2">
-          {/*
+        {/*<div className="flex gap-2">*/}
+        {/*
             - first filter applied to get the objects that hasn't been attached to any drop zone "undefined"
             - then map over them to be displayed in the free zone
             */}
-          {draggables
+        {/*{draggables
             .filter((draggable) => draggable.dropZone === undefined)
             .map((draggable) => (
               <Draggable key={draggable.id} draggable={draggable} />
             ))}
-        </div>
+        </div>*/}
       </DndContext>
     </div>
   );
