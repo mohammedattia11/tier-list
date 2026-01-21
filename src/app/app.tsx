@@ -7,7 +7,7 @@ import type { DraggableTypes } from "@/types";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { useAtom } from "jotai";
 import { useState } from "react";
-import { handleDragEnd } from "@/utils/handle-drag-end";
+import { handleDragOver } from "@/utils/handle-drag-over";
 
 // drop zone used to attach each object to specefic drop zone and if it undfined means it hasn't attached to any available drop zone
 
@@ -22,9 +22,8 @@ function App() {
         onDragStart={(e) =>
           handleDragStart({ e, draggables, setActiveDraggable })
         }
-        onDragEnd={(e) =>
-          handleDragEnd({ e, setDraggables, setActiveDraggable })
-        }
+        onDragEnd={() => setActiveDraggable(undefined)}
+        onDragOver={(e) => handleDragOver({ e, setDraggables })}
       >
         <DropZone draggables={draggables} />
         {/*<div className="flex gap-2">*/}

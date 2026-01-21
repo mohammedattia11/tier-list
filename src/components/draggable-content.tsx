@@ -17,6 +17,7 @@ function DraggableContent({ draggable, isDragging }: DraggablePropsTypes) {
       style={{
         opacity: isDragging || activeDraggableId !== id ? 1 : 0,
       }}
+      className="max-h-32"
     />
   );
 }

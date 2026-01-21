@@ -1,4 +1,7 @@
-import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
+import type {
+  DragOverEvent,
+  DragStartEvent,
+} from "@dnd-kit/core";
 
 export type DraggableTypes = {
   id: string;
@@ -14,10 +17,7 @@ export type handleDragStartTypes = {
   >;
 };
 
-export type handleDragEndTypes = {
-  e: DragEndEvent;
+export type handleDragOverTypes = {
+  e: DragOverEvent;
   setDraggables: React.Dispatch<React.SetStateAction<DraggableTypes[]>>;
-  setActiveDraggable: React.Dispatch<
-    React.SetStateAction<DraggableTypes | undefined>
-  >;
 };

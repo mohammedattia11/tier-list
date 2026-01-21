@@ -1,13 +1,4 @@
-import type { DraggableTypes } from "@/types";
-import type { DragStartEvent } from "@dnd-kit/core";
-
-type handleDragStartTypes = {
-  e: DragStartEvent;
-  draggables: DraggableTypes[];
-  setActiveDraggable: React.Dispatch<
-    React.SetStateAction<DraggableTypes | undefined>
-  >;
-};
+import type { DraggableTypes, handleDragStartTypes } from "@/types";
 
 export const handleDragStart = ({
   e,
