@@ -20,7 +20,7 @@ function DropZone({ draggables }: DropZonePropsTypes) {
       ref={setNodeRef}
     >
       <SortableContext items={draggables.map((draggable) => draggable.id)}>
-        {draggables.map((draggable) => (
+        {draggables.filter(draggable => draggable.dropZone).map((draggable) => (
           <Draggable key={draggable.id} draggable={draggable} />
         ))}
       </SortableContext>

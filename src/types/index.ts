@@ -20,4 +20,5 @@ export type handleDragStartTypes = {
 export type handleDragOverTypes = {
   e: DragOverEvent;
   setDraggables: React.Dispatch<React.SetStateAction<DraggableTypes[]>>;
+  activeDraggable: DraggableTypes | undefined
 };
