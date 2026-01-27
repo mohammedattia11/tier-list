@@ -10,7 +10,7 @@ export function handleDragOver({
   // draggable didn't touch the drop zone
 
   if (!e.over || !activeDraggable) return;
-  
+
   const overId = e.over.id as string;
   const activeDraggableId = e.active.id;
 
@@ -32,17 +32,18 @@ export function handleDragOver({
       return prev.map((dz) => {
         if (dz.id !== overId && dz.id !== currentDropzoneId) return dz;
 
-        if (dz.id === currentDropzoneId && currentDropzoneId !== overId)
+        if (dz.id === currentDropzoneId && currentDropzoneId !== overId) {
           return {
             ...dz,
             draggables: dz.draggables.filter((d) => d !== activeDraggableId),
           };
+        }
 
         return { ...dz, draggables: newDraggables };
       });
     }
     // Case #2: Rearranging items in the same row
-    if (currentDropzone.draggables.some((d) => d === overId)) {
+    else if (currentDropzone.draggables.some((d) => d === overId)) {
       const oldIndex = currentDropzone?.draggables.findIndex(
         (draggable) => draggable === activeDraggableId,
       );
@@ -64,6 +65,34 @@ export function handleDragOver({
       });
     }
     // Case #3: if we re-arranging between 2 diffrenet rows
+    else if (!currentDropzone.draggables.some((d) => d === overId)) {
+      const newDropzone = dropzones.find((dz) =>
+        dz.draggables.some((d) => d === overId),
+      );
+
+      if (!newDropzone) return prev;
+
+      const overIndex = newDropzone.draggables.findIndex((d) => d === overId);
+      const newDraggables = newDropzone.draggables.toSpliced(
+        overIndex,
+        0,
+        activeDraggableId
+      );
+
+      return prev.map((dz) => {
+        // if not the old or new drop-zone keep it and dont' change
+        if (dz.id !== currentDropzoneId && dz.id !== newDropzone.id) return dz;
+        // remove from old one
+        else if (dz.id === currentDropzoneId) {
+          return {
+            ...dz,
+            draggables: dz.draggables.filter((d) => d !== activeDraggableId),
+          };
+        }
+        // Add to new 
+        return {...dz,draggables:newDraggables}
+      });
+    }
     return prev;
   });
 }
