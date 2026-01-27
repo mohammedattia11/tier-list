@@ -1,14 +1,12 @@
-import type { DraggableTypes } from "@/types";
+import type { DropzoneType } from "@/types";
 import { useDroppable } from "@dnd-kit/core";
 import Draggable from "./draggable";
 import { SortableContext } from "@dnd-kit/sortable";
+import { DefaultDraggables } from "@/data/default-draggables";
 
-type DropZonePropsTypes = {
-  draggables: DraggableTypes[];
-};
-
-function DropZone({ draggables }: DropZonePropsTypes) {
-  const { setNodeRef, isOver } = useDroppable({ id: "drop-zone" });
+function DropZone({ dropzone }: { dropzone: DropzoneType }) {
+  const { id, draggables } = dropzone;
+  const { setNodeRef, isOver } = useDroppable({ id });
   const style = {
     backgroundColor: isOver ? "green" : undefined,
   };
@@ -19,10 +17,12 @@ function DropZone({ draggables }: DropZonePropsTypes) {
       style={style}
       ref={setNodeRef}
     >
-      <SortableContext items={draggables.map((draggable) => draggable.id)}>
-        {draggables.filter(draggable => draggable.dropZone).map((draggable) => (
-          <Draggable key={draggable.id} draggable={draggable} />
-        ))}
+      <SortableContext items={draggables}>
+        {draggables.map((draggableId) => {
+          const draggable = DefaultDraggables.find((d) => d.id === draggableId);
+          if (!draggable) return null;
+          return <Draggable key={draggableId} draggable={draggable} />;
+        })}
       </SortableContext>
     </div>
   );

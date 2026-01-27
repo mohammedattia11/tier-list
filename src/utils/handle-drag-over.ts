@@ -1,64 +1,69 @@
 import type { handleDragOverTypes } from "@/types";
 import { arrayMove } from "@dnd-kit/sortable";
-
+import { dropzoneIds } from "@/data/default-drop-zones";
 export function handleDragOver({
   e,
-  setDraggables,
+  setDropzones,
+  dropzones,
   activeDraggable,
 }: handleDragOverTypes) {
   // draggable didn't touch the drop zone
 
   if (!e.over || !activeDraggable) return;
-  console.log(e);
-  const overId = e.over.id;
+  
+  const overId = e.over.id as string;
   const activeDraggableId = e.active.id;
 
-  setDraggables((prev) => {
-    // if we're hovering the empty space in drop zone
-    if (overId === "drop-zone") {
-      // Check if the draggable already has the correct dropZone to avoid unnecessary updates
-      const currentDraggable = prev.find(
-        (draggable) => draggable.id === activeDraggableId,
-      );
-      if (currentDraggable?.dropZone === "drop-zone") {
-        return prev;
-      }
-      const newDraggable = { ...activeDraggable, dropZone: "drop-zone" };
-      return [
-        ...prev.filter((draggable) => draggable.id !== activeDraggableId),
-        newDraggable,
-      ];
-    }
-    // if we're hovering the space inside Sortable context
-    const overDraggable = prev.find((draggable) => draggable.id === overId);
-    const overDropZone = !!overDraggable?.dropZone;
-    const oldIndex = prev.findIndex(
-      (draggable) => draggable.id === activeDraggableId,
+  setDropzones((prev) => {
+    const currentDropzone = dropzones.find((dz) =>
+      dz.draggables.some((d) => d === activeDraggableId),
     );
-    const newIndex = prev.findIndex((draggable) => draggable.id === overId);
+    if (!currentDropzone) return;
+    const currentDropzoneId = currentDropzone.id;
 
-    if (oldIndex === newIndex) {
-      // Check if dropZone needs to change
-      const currentDraggable = prev[oldIndex];
-      const targetDropZone = overDropZone ? "drop-zone" : undefined;
-      if (currentDraggable?.dropZone === targetDropZone) {
-        return prev;
-      }
-      // If dropZone needs to change but position doesn't, update only the dropZone
-      const updated = [...prev];
-      updated[oldIndex] = {
-        ...updated[oldIndex],
-        dropZone: targetDropZone,
-      };
-      return updated;
+    // Case #1: if we're hovering the empty space in drop zone
+    if (dropzoneIds.includes(overId)) {
+      const dropzone = prev.find((dz) => dz.id === overId)!;
+      const newDraggables = [
+        ...dropzone.draggables.filter((d) => d !== activeDraggableId),
+        activeDraggableId,
+      ];
+
+      return prev.map((dz) => {
+        if (dz.id !== overId && dz.id !== currentDropzoneId) return dz;
+
+        if (dz.id === currentDropzoneId && currentDropzoneId !== overId)
+          return {
+            ...dz,
+            draggables: dz.draggables.filter((d) => d !== activeDraggableId),
+          };
+
+        return { ...dz, draggables: newDraggables };
+      });
     }
+    // Case #2: Rearranging items in the same row
+    if (currentDropzone.draggables.some((d) => d === overId)) {
+      const oldIndex = currentDropzone?.draggables.findIndex(
+        (draggable) => draggable === activeDraggableId,
+      );
+      const newIndex = currentDropzone?.draggables.findIndex(
+        (draggable) => draggable === overId,
+      );
 
-    const shiftedItems = arrayMove(prev, oldIndex, newIndex);
-    shiftedItems[newIndex] = {
-      ...shiftedItems[newIndex],
-      dropZone: overDropZone ? "drop-zone" : undefined,
-    };
+      if (oldIndex === newIndex) return prev;
 
-    return shiftedItems;
+      const newDraggables = arrayMove(
+        currentDropzone?.draggables,
+        oldIndex,
+        newIndex,
+      );
+
+      return prev.map((dz) => {
+        if (dz.id !== currentDropzoneId) return dz;
+        return { ...dz, draggables: newDraggables };
+      });
+    }
+    // Case #3: if we re-arranging between 2 diffrenet rows
+    return prev;
   });
 }

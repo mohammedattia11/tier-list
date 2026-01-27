@@ -1,12 +1,8 @@
-import type {
-  DragOverEvent,
-  DragStartEvent,
-} from "@dnd-kit/core";
+import type { DragOverEvent, DragStartEvent } from "@dnd-kit/core";
 
 export type DraggableTypes = {
   id: string;
   src: string;
-  dropZone?: string;
 };
 
 export type handleDragStartTypes = {
@@ -19,6 +15,12 @@ export type handleDragStartTypes = {
 
 export type handleDragOverTypes = {
   e: DragOverEvent;
-  setDraggables: React.Dispatch<React.SetStateAction<DraggableTypes[]>>;
-  activeDraggable: DraggableTypes | undefined
+  setDropzones: React.Dispatch<React.SetStateAction<DropzoneType[]>>;
+  dropzones: DropzoneType[]
+  activeDraggable: DraggableTypes | undefined;
+};
+
+export type DropzoneType = {
+  id: string;
+  draggables: string[];
 };
