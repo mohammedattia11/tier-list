@@ -8,10 +8,7 @@ import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { useAtom } from "jotai";
 import { useState } from "react";
 import { handleDragOver } from "@/utils/handle-drag-over";
-// import Draggable from "@/components/draggable";
-// import { SortableContext } from "@dnd-kit/sortable";
 import { defaultDropzones } from "@/data/default-drop-zones";
-
 // drop zone used to attach each object to specefic drop zone and if it undfined means it hasn't attached to any available drop zone
 
 function App() {
@@ -19,10 +16,12 @@ function App() {
     useState<DraggableTypes[]>(DefaultDraggables);
   const [activeDraggable, setActiveDraggable] = useAtom(activeDraggableAtom);
   const [dropzones, setDropzones] = useState<DropzoneType[]>(defaultDropzones);
-  // const freeDraggables = draggables.filter((draggable) => !draggable.dropZone);
+
+  const freeDropZone = dropzones.find((dz) => dz.id === "free");
+  if (!freeDropZone) return null;
 
   return (
-    <div className="flex h-screen w-full flex-col items-center justify-center gap-16">
+    <div className="flex h-screen w-full flex-col items-center justify-center">
       <DndContext
         onDragStart={(e) =>
           handleDragStart({ e, draggables, setActiveDraggable })
@@ -32,9 +31,12 @@ function App() {
           handleDragOver({ e, setDropzones, dropzones, activeDraggable })
         }
       >
-        {dropzones.map((dz) => (
-          <DropZone dropzone={dz} />
-        ))}
+        {dropzones
+          .filter((dz) => dz.id !== "free")
+          .map((dz) => (
+            <DropZone dropzone={dz} />
+          ))}
+        <DropZone dropzone={freeDropZone} />
         <DragOverlay>
           {activeDraggable && (
             <DraggableContent draggable={activeDraggable} isDragging />

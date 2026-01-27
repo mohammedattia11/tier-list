@@ -12,15 +12,15 @@ export function handleDragOver({
   if (!e.over || !activeDraggable) return;
 
   const overId = e.over.id as string;
-  const activeDraggableId = e.active.id;
+  const activeDraggableId = e.active.id as string;
+
+  const currentDropzone = dropzones.find((dz) =>
+    dz.draggables.some((d) => d === activeDraggableId),
+  );
+  if (!currentDropzone) return;
+  const currentDropzoneId = currentDropzone.id;
 
   setDropzones((prev) => {
-    const currentDropzone = dropzones.find((dz) =>
-      dz.draggables.some((d) => d === activeDraggableId),
-    );
-    if (!currentDropzone) return;
-    const currentDropzoneId = currentDropzone.id;
-
     // Case #1: if we're hovering the empty space in drop zone
     if (dropzoneIds.includes(overId)) {
       const dropzone = prev.find((dz) => dz.id === overId)!;
