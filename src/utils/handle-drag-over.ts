@@ -1,14 +1,14 @@
 import type { handleDragOverTypes } from "@/types";
 import { arrayMove } from "@dnd-kit/sortable";
 import { dropzoneIds } from "@/data/default-drop-zones";
-export function handleDragOver({
+import { throttle } from 'lodash';
+
+function handleDragOverLogic({
   e,
   setDropzones,
   dropzones,
   activeDraggable,
 }: handleDragOverTypes) {
-  // draggable didn't touch the drop zone
-
   if (!e.over || !activeDraggable) return;
 
   const overId = e.over.id as string;
@@ -64,9 +64,9 @@ export function handleDragOver({
         return { ...dz, draggables: newDraggables };
       });
     }
-    // Case #3: if we re-arranging between 2 diffrenet rows
+    // Case #3: if we re-arranging between 2 different rows
     else if (!currentDropzone.draggables.some((d) => d === overId)) {
-      const newDropzone = dropzones.find((dz) =>
+      const newDropzone = prev.find((dz) => // Use 'prev' here for latest state
         dz.draggables.some((d) => d === overId),
       );
 
@@ -80,19 +80,20 @@ export function handleDragOver({
       );
 
       return prev.map((dz) => {
-        // if not the old or new drop-zone keep it and dont' change
         if (dz.id !== currentDropzoneId && dz.id !== newDropzone.id) return dz;
-        // remove from old one
         else if (dz.id === currentDropzoneId) {
           return {
             ...dz,
             draggables: dz.draggables.filter((d) => d !== activeDraggableId),
           };
         }
-        // Add to new 
-        return {...dz,draggables:newDraggables}
+        return { ...dz, draggables: newDraggables }
       });
     }
     return prev;
   });
 }
+
+// 2. Export the throttled version
+// 50ms-100ms is usually the "sweet spot" for drag operations
+export const handleDragOver = throttle(handleDragOverLogic, 100);
