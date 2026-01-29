@@ -18,7 +18,7 @@ function DropZone({ dropzone }: { dropzone: DropzoneType }) {
   const backgroundColor = dropZoneColorMap[id as keyof typeof dropZoneColorMap];
   
   return (
-    <div className="flex h-32 w-full gap-4 border border-white bg-zinc-700">
+    <div className="flex h-32 w-full gap-4 border bg-stone-900">
       <div className="w-30 flex justify-center items-center text-4xl font-semibold" style={{backgroundColor}}>
         {id}
       </div>

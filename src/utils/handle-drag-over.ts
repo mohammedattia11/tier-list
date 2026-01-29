@@ -1,6 +1,5 @@
 import type { handleDragOverTypes } from "@/types";
 import { arrayMove } from "@dnd-kit/sortable";
-import { dropzoneIds } from "@/data/default-drop-zones";
 import { throttle } from 'lodash';
 
 function handleDragOverLogic({
@@ -8,6 +7,7 @@ function handleDragOverLogic({
   setDropzones,
   dropzones,
   activeDraggable,
+  dropZonesIds 
 }: handleDragOverTypes) {
   if (!e.over || !activeDraggable) return;
 
@@ -22,7 +22,7 @@ function handleDragOverLogic({
 
   setDropzones((prev) => {
     // Case #1: if we're hovering the empty space in drop zone
-    if (dropzoneIds.includes(overId)) {
+    if (dropZonesIds .includes(overId)) {
       const dropzone = prev.find((dz) => dz.id === overId)!;
       const newDraggables = [
         ...dropzone.draggables.filter((d) => d !== activeDraggableId),

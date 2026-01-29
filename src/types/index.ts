@@ -16,8 +16,9 @@ export type handleDragStartTypes = {
 export type handleDragOverTypes = {
   e: DragOverEvent;
   setDropzones: React.Dispatch<React.SetStateAction<DropzoneType[]>>;
-  dropzones: DropzoneType[]
+  dropzones: DropzoneType[];
   activeDraggable: DraggableTypes | undefined;
+  dropZonesIds: string[];
 };
 
 export type DropzoneType = {
